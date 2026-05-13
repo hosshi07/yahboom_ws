@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'move_pkg'
+package_name = 'recognition_pkg'
 
 setup(
     name=package_name,
@@ -27,8 +27,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'base_control = move_pkg.base_control:main',
-            'sign_move = move_pkg.sign_move:main',
+            'hand_sign_node = recognition_pkg.hand_sign_node:main'
         ],
     },
 )
