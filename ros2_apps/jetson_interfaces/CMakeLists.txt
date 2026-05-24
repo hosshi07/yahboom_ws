@@ -16,7 +16,7 @@ find_package(action_msgs REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 set(msg_files
-  
+  "msg/Coordinates.msg"
 )
 
 rosidl_generate_interfaces(

@@ -13,7 +13,7 @@ colors = {
 }
 class CameraPublisher(Node):
     def __init__(self):
-        super().__init__('camera_publisher')
+        super().__init__('camera_yolo_publisher')
         self.publisher_ = self.create_publisher(Image, 'camera/yolo', 10)
         command = input("カメラのモデルは?(lap or logi): ")
         # カメラ番号の設定

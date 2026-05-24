@@ -5,8 +5,10 @@ import math
 
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
-    max_num_hands=1, 
-    min_detection_confidence=0.7,
+    static_image_mode=False,        # 動画ストリームとして処理（これ重要）
+    max_num_hands=1,                # 認識する手は「1つ」に制限（計算量が半減！）
+    model_complexity=0,             # 【超重要】0:最速, 1:標準。0にすると劇的に軽くなります
+    min_detection_confidence=0.5,
     min_tracking_confidence=0.5
 )
 mp_draw = mp.solutions.drawing_utils
@@ -119,10 +121,12 @@ def get_gesture(landmarks):
         cv2.putText(debug_image, f"deg: {int(deg)}", (10, 150),
                 cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
 
-        if 150 < deg <= 269:
+        if 150 < deg <= 230:
             return "LEFT"
-        elif deg < 35 or deg >= 270:
+        elif deg < 35 or deg >= 300:
             return "RIGHT"
+        elif 231 < deg < 299:
+            return "BEHYND"
         else:
             return "FORWARD"
 

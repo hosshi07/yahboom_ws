@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'camera_get = camera_info.camera_get:main'
+            'camera_get = camera_info.camera_get:main',
+            'yolo_camera = camera_info.yolo_camera:main'
         ],
     },
 )

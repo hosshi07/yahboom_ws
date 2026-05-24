@@ -4,41 +4,52 @@ from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
 from cv_bridge import CvBridge
 import cv2
+# QoS
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 
 class CameraPublisher(Node):
     def __init__(self):
         super().__init__('camera_publisher')
-        self.publisher_ = self.create_publisher(Image, '/camera/camera/color/image_raw', 10)
         
+        # 1. リアルタイム画像転送に最適なQoSプロファイルを作成
+        qos_profile = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT, 
+            history=HistoryPolicy.KEEP_LAST,
+            depth=1                          
+        )
         
-        #command = input("カメラのモデルは?(lap or logi): ")
-        # カメラ番号の設定
+        # パブリッシャーにQoSを適用
+        self.publisher_ = self.create_publisher(Image, '/camera/camera/color/image_raw', qos_profile)
+        
         self.num = 0
-        # self.num = 4 if command == "logi" else 0
+        self.cap = cv2.VideoCapture(self.num)  # カメラの初期化
         
-        self.create_timer(0.01, self.publish_image)  # 0.1秒ごとに画像をパブリッシュ
+        # 解像度を 640x480 (VGA) に設定
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+                
+        # 2. 【重要】カメラの撮影能力（30fps）に合わせてタイマーを最適化
+        # 0.033秒ごとに設定することで、OpenCV内部での詰まり（バッファ遅延）を完全に防ぎます by gemini
+        self.create_timer(0.033, self.publish_image)  
         
-        self.cap = cv2.VideoCapture(self.num)  # カメラ番号を指定
-        self.br = CvBridge()  # CvBridgeのインスタンスを作成
-        self.get_logger().info("service ready!")
+        self.br = CvBridge()  
+        self.get_logger().info("Camera Publisher Service Ready! (QoS: Best Effort / 30fps)")
 
-    
     def publish_image(self):
-        ret, frame = self.cap.read()  # カメラからフレームを取得
+        #バッファのの初期化 古いフレームを破棄
+        self.cap.grab()
+        ret, frame = self.cap.read()
         if not ret:
             self.get_logger().error("カメラからの映像を取得できませんでした。")
             return
-        image = cv2.flip(frame, 1)  # 水平反転
-        # cv2.imshow('Pub Image', image)
-        # cv2.waitKey(1)
-        # OpenCVのBGR画像をROSのImageメッセージに変換
+            
+
         image_msg = self.br.cv2_to_imgmsg(frame, encoding='bgr8')
+        
         # 画像をパブリッシュ
         self.publisher_.publish(image_msg)
-        #self.get_logger().info("画像をパブリッシュしました。")
 
     def destroy_node(self):
-        # cv2.destroyAllWindows()
         self.cap.release()  # カメラを解放
         super().destroy_node()
 
@@ -55,4 +66,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-

@@ -17,5 +17,10 @@ def generate_launch_description():
             package='move_pkg',
             executable='sign_move',
             name='sing_getter',
-        )
+        ),
+        Node(
+            package='move_pkg',
+            executable='hand_follow',
+            name='hand_follow',
+        ),
     ])

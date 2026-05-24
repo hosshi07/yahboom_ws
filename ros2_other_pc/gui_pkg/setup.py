@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 import os
 from glob import glob
 
-package_name = 'move_pkg'
+package_name = 'gui_pkg'
 
 setup(
     name=package_name,
@@ -12,7 +12,8 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
+        (os.path.join('share', package_name, 'launch'),
+            glob('launch/*.launch.py'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -27,9 +28,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'base_control = move_pkg.base_control:main',
-            'sign_move = move_pkg.sign_move:main',
-            'hand_follow = move_pkg.hand_follow:main',
+            'arm_gui_node = gui_pkg.arm_gui_node:main',
+            'voice_gui_node = gui_pkg.voice_gui_node:main',
+            'yahboom_commander = gui_pkg.yahboom_commander:main',
         ],
     },
 )
